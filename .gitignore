@@ -1,0 +1,10 @@
+.jxbrowser-data/
+.metadata/
+**/Debug/*
+**/targetConfigs/*
+**/.ccsproject
+**/.cproject
+**/.launches/*.launch
+**/.project
+**/.settings/*
+**/lnk_msp430g2553.cmd
