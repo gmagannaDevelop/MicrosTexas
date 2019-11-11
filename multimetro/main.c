@@ -25,10 +25,15 @@ void main(void) {
     int d = 0;
     //int mame;
 
-    while(1){
-
-
-        ADC10CTL0 = (SREF_0 | ADC10SHT_0 | ADC10ON | ENC | ADC10SC);
+    while(1)
+    {
+        ADC10CTL0 = (
+                SREF_0     |     /* ADC10 Reference Select Bit: 0 */
+                ADC10SHT_0 |     /* VALUE = (0*0x800u) ; 4 x ADC10CLKs */
+                ADC10ON    |     /* ADC10 On/Enable */
+                ENC        |
+                ADC10SC
+        );
 
             while((ADC10IFG&0x04)==0){}
             LCD_WriteCommand(LCD_CLEAR_SCREEN);
@@ -36,54 +41,56 @@ void main(void) {
             d=ADC10MEM;
             //mame = 10 * d / 850;
 
+
             for(i=0; i<16; i++){ char_LCD[i]=0; } //Clear char_LCD
             itoa(d, char_LCD, 10); //Pasar int_Value a decimal
             LCD_WriteROMString("Voltaje:",0,0);
             LCD_WriteString(char_LCD,0,1);
-            Delay_centSeg(10);
+            Delay_centSeg(50);
+
 
             /*
             if((d>=0)&&(d<170))
             {
                 LCD_WriteCommand(LCD_CLEAR_SCREEN);
                 LCD_WriteROMString("Voltaje:",1,0);
-                LCD_WriteROMString("",0,1);
-                Delay_Seg(3);
+                LCD_WriteROMString("||",0,1);
+                Delay_centSeg(50);
             }
             else if((d>=170)&&(d<340))
             {
                 LCD_WriteCommand(LCD_CLEAR_SCREEN);
                 LCD_WriteROMString("Voltaje:",1,0);
-                LCD_WriteROMString("~~",0,1);
-                Delay_Seg(3);
+                LCD_WriteROMString("|||",0,1);
+                Delay_centSeg(50);
             }
             else if((d>=340)&&(d<510))
             {
                 LCD_WriteCommand(LCD_CLEAR_SCREEN);
                 LCD_WriteROMString("Voltaje:",1,0);
-                LCD_WriteROMString("~",0,1);
-                Delay_Seg(3);
+                LCD_WriteROMString("||||",0,1);
+                Delay_centSeg(50);
             }
             else if((d>=510)&&(d<680))
             {
                 LCD_WriteCommand(LCD_CLEAR_SCREEN);
                 LCD_WriteROMString("Voltaje:",1,0);
-                LCD_WriteROMString("~~",0,1);
-                Delay_Seg(3);
+                LCD_WriteROMString("|||||",0,1);
+                Delay_centSeg(50);
             }
             else if((d>=680)&&(d<850))
             {
                 LCD_WriteCommand(LCD_CLEAR_SCREEN);
                 LCD_WriteROMString("Voltaje:",1,0);
-                LCD_WriteROMString("~~~",0,1);
-                Delay_Seg(3);
+                LCD_WriteROMString("||||||",0,1);
+                Delay_centSeg(50);
             }
             else
             {
                 LCD_WriteCommand(LCD_CLEAR_SCREEN);
                 LCD_WriteROMString("Voltaje:",1,0);
                 LCD_WriteROMString("NADA",0,1);
-                Delay_Seg(3);
+                Delay_centSeg(50);
             }
            */
            } //end while
