@@ -5,20 +5,29 @@
 
 void Delay_centSeg(volatile unsigned int t);
 
-void main(void) {
-    WDTCTL = WDTPW + WDTHOLD;//Stop watchdog timer
-    BCSCTL1 = CALBC1_1MHZ;// Use 1Mhz cal data for DCO
-    DCOCTL = CALDCO_1MHZ;// Use 1Mhz cal data for DCO
-    P1DIR = 0xFF;
-    P1DIR ^= 0x80;  // Ponemos en cero el bit P1.6, para leer el voltaje.
-    P1OUT = 0x00;
-    LCD_Init();//Se inicializa LCD
-    //P1DIR = 0x40;
-    P2DIR = 0x01;
-    ADC10CTL1 = (INCH_3 | SHS_0);     // Conf convertidor analogico-digital
-    //ADC10AE0  = 0x08;
-    ADC10AE0  = 0x40;
-    ADC10CTL0 = (SREF_0 | ADC10SHT_0 | ADC10ON);
+void main(void)
+{
+    WDTCTL = WDTPW + WDTHOLD;           // Stop watchdog timer √
+    BCSCTL1 = CALBC1_1MHZ;              // Use 1Mhz cal data for DCO √
+    DCOCTL = CALDCO_1MHZ;               // Use 1Mhz cal data for DCO √
+    P1DIR = 0xFF;                       // P1 <- SALIDA
+    P1DIR ^= 0x80;                      // Ponemos en cero el bit P1.6, para leer el voltaje.
+    P1OUT = 0x00;                       //                                                      ??
+
+    LCD_Init();                         // Se inicializa LCD
+
+    P2DIR = 0x01;                       // P2 <- ENTRADA; P2.0 <- SALIDA
+    ADC10CTL1 = (                       // Configura convertidor analogico-digital
+            INCH_3 |                    // INCH_3 : (3*0x1000u)  Selects Channel 3              !!
+            SHS_0                       // (0x0400) /* ADC10 Sample/Hold Source Bit: 0 */
+    );
+
+    ADC10AE0  = 0x40;                   //
+    ADC10CTL0 = (
+            SREF_0 |
+            ADC10SHT_0 |
+            ADC10ON
+    );
 
     int int_Value = 10;
     char char_LCD[16], i;
@@ -31,8 +40,8 @@ void main(void) {
                 SREF_0     |     /* ADC10 Reference Select Bit: 0 */
                 ADC10SHT_0 |     /* VALUE = (0*0x800u) ; 4 x ADC10CLKs */
                 ADC10ON    |     /* ADC10 On/Enable */
-                ENC        |
-                ADC10SC
+                ENC        |     /* ADC10 Enable Conversion */
+                ADC10SC          /* ADC10 Start Conversion */
         );
 
             while((ADC10IFG&0x04)==0){}
@@ -95,12 +104,28 @@ void main(void) {
            */
            } //end while
 
-          } // end main
+} // end main
 
 
-void Delay_centSeg(volatile unsigned int t){
+void Delay_centSeg(volatile unsigned int t)
+{
     volatile unsigned int i;
     for (i=0 ;i<t; i++){
             __delay_cycles(10000);
     }
 }
+
+// ADC10 interrupt service routine
+#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
+#pragma vector=ADC10_VECTOR
+__interrupt void ADC10_ISR(void)
+#elif defined(__GNUC__)
+void __attribute__ ((interrupt(ADC10_VECTOR))) ADC10_ISR (void)
+#else
+#error Compiler not supported!
+#endif
+{
+  __bic_SR_register_on_exit(CPUOFF);        // Clear CPUOFF bit from 0(SR)
+}
+
+
