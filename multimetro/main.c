@@ -3,7 +3,7 @@
 #include "lcd.h"
 #include "special.h"
 
-void Delay_Seg(volatile unsigned int t);
+void Delay_centSeg(volatile unsigned int t);
 
 void main(void) {
     WDTCTL = WDTPW + WDTHOLD;//Stop watchdog timer
@@ -19,7 +19,11 @@ void main(void) {
     //ADC10AE0  = 0x08;
     ADC10AE0  = 0x40;
     ADC10CTL0 = (SREF_0 | ADC10SHT_0 | ADC10ON);
+
+    int int_Value = 10;
+    char char_LCD[16], i;
     int d = 0;
+    //int mame;
 
     while(1){
 
@@ -30,7 +34,15 @@ void main(void) {
             LCD_WriteCommand(LCD_CLEAR_SCREEN);
 
             d=ADC10MEM;
+            //mame = 10 * d / 850;
 
+            for(i=0; i<16; i++){ char_LCD[i]=0; } //Clear char_LCD
+            itoa(d, char_LCD, 10); //Pasar int_Value a decimal
+            LCD_WriteROMString("Voltaje:",0,0);
+            LCD_WriteString(char_LCD,0,1);
+            Delay_centSeg(10);
+
+            /*
             if((d>=0)&&(d<170))
             {
                 LCD_WriteCommand(LCD_CLEAR_SCREEN);
@@ -73,14 +85,15 @@ void main(void) {
                 LCD_WriteROMString("NADA",0,1);
                 Delay_Seg(3);
             }
+           */
            } //end while
 
           } // end main
 
 
-void Delay_Seg(volatile unsigned int t){
+void Delay_centSeg(volatile unsigned int t){
     volatile unsigned int i;
     for (i=0 ;i<t; i++){
-            __delay_cycles(1000000);
+            __delay_cycles(10000);
     }
 }
