@@ -12,6 +12,7 @@
 
 
 #include <msp430g2553.h>
+#include <stdio.h>
 #include "lcd.h"
 #include "special.h"
 
@@ -148,18 +149,4 @@ void Delay(volatile unsigned int t)
             __delay_cycles(10000);
     }
 }
-
-// ADC10 interrupt service routine
-#if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
-#pragma vector=ADC10_VECTOR
-__interrupt void ADC10_ISR(void)
-#elif defined(__GNUC__)
-void __attribute__ ((interrupt(ADC10_VECTOR))) ADC10_ISR (void)
-#else
-#error Compiler not supported!
-#endif
-{
-  __bic_SR_register_on_exit(CPUOFF);        // Clear CPUOFF bit from 0(SR)
-}
-
 
