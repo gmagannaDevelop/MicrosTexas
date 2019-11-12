@@ -1,3 +1,15 @@
+/*
+ *  Univesridad de Guanajuato
+ *  División de Ciencias e Ingenierías
+ *
+ *  Curso :  Arquitectura de microcontroladores.
+ *  Profesor : Dr. Carlos Villaseñor Mora
+ *  Alumnos :
+ *      Jonathan Alejandro Gonzalez Pérez
+ *      Uriel Moreno
+ *      Gustavo Magaña López
+ * */
+
 
 #include <msp430g2553.h>
 #include "lcd.h"
@@ -17,16 +29,29 @@ void main(void)
     LCD_Init();                         // Se inicializa LCD
 
     P2DIR = 0x01;                       // P2 <- ENTRADA; P2.0 <- SALIDA
+    /*
+     * The ADC10 core is configured by two control registers, ADC10CTL0 and ADC10CTL1.
+     * The core is enabled with the ADC10ON bit.
+     * With few exceptions the ADC10 control bits can only be modified when ENC = 0.
+     * ENC must be set to 1 before any conversion can take place.
+     * */
+
     ADC10CTL1 = (                       // Configura convertidor analogico-digital
-            INCH_3 |                    // INCH_3 : (3*0x1000u)  Selects Channel 3              !!
+            INCH_6 |                    // INCH_N : Selects Channel N                        !!
             SHS_0                       // (0x0400) /* ADC10 Sample/Hold Source Bit: 0 */
     );
 
-    ADC10AE0  = 0x40;                   //
-    ADC10CTL0 = (
-            SREF_0 |
-            ADC10SHT_0 |
-            ADC10ON
+    /*
+    ADC10 analog enable. These bits enable the corresponding pin for analog input. BIT0 corresponds to A0, BIT1 corresponds to A1, etc. The analog enable bit of not implemented channels should not be programmed to 1.
+    0 Analog input disabled
+    1 Analog input enabled
+    */
+    ADC10AE0  = 0x40;                   // P1.6 <- ENTRADA ANALÓGICA
+
+    ADC10CTL0 = (                       // Configura convertidor analógico-digital
+            SREF_0 |                    /* ADC10 Reference Select Bit: 0 */
+            ADC10SHT_0 |                /* 4 x ADC10CLKs */
+            ADC10ON                     /* ADC10 On/Enable */
     );
 
     int int_Value = 10;
