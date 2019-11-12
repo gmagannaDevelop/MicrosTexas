@@ -12,6 +12,7 @@
 
 
 #include <msp430g2553.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "lcd.h"
 #include "special.h"
@@ -74,12 +75,13 @@ void main(void)
             LCD_WriteCommand(LCD_CLEAR_SCREEN);
 
             d=ADC10MEM;
-            d *= 5;
+            d *= 4;
             d /= 1023;
 
 
             for(i=0; i<16; i++){ char_LCD[i]=0; }   // Clear char_LCD
             itoa(d, char_LCD, 10);                  // Pasar int_Value a decimal
+            //snprintf(char_LCD, 16, "%f", d);
             LCD_WriteROMString("Voltaje:",0,0);
             LCD_WriteString(char_LCD,0,1);
             Delay(50);                              // Centésimas de segundo
