@@ -15,7 +15,7 @@
 #include "lcd.h"
 #include "special.h"
 
-void Delay_centSeg(volatile unsigned int t);
+void Delay(volatile unsigned int t);
 
 void main(void)
 {
@@ -73,14 +73,15 @@ void main(void)
             LCD_WriteCommand(LCD_CLEAR_SCREEN);
 
             d=ADC10MEM;
-            //mame = 10 * d / 850;
+            d *= 5;
+            d /= 1023;
 
 
-            for(i=0; i<16; i++){ char_LCD[i]=0; } //Clear char_LCD
-            itoa(d, char_LCD, 10); //Pasar int_Value a decimal
+            for(i=0; i<16; i++){ char_LCD[i]=0; }   // Clear char_LCD
+            itoa(d, char_LCD, 10);                  // Pasar int_Value a decimal
             LCD_WriteROMString("Voltaje:",0,0);
             LCD_WriteString(char_LCD,0,1);
-            Delay_centSeg(50);
+            Delay(50);                              // Centésimas de segundo
 
 
             /*
@@ -132,8 +133,16 @@ void main(void)
 } // end main
 
 
-void Delay_centSeg(volatile unsigned int t)
+void Delay(volatile unsigned int t)
 {
+    /*
+     * Delay utilizando ciclos del micro.
+     * Cambiar el número dentro de
+     * __delay_cycles(n) para modificar el comportamiento:
+     *      n : 10000   -> Centésimas de segundo
+     *      n : 100000  -> Décimas de segundo.
+     *      n : 1000000 -> Segundos.
+     */
     volatile unsigned int i;
     for (i=0 ;i<t; i++){
             __delay_cycles(10000);
